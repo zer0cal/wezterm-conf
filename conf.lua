@@ -19,33 +19,6 @@ config.default_prog = { "nu", "-l" }
 -- To execute any keybinding, press the leader key (ALT + q) first, then the corresponding key.
 config.leader = { key = "q", mods = "ALT", timeout_miliseconds = 2000 }
 
--- alt-tab
-local tab_history = {}
-
-wezterm.on("update-tab-history", function(window, _)
-	local tab = window:active_tab()
-	if tab then
-		local tab_id = tab:tab_id()
-		-- Dodaj ID zakładki do historii, jeśli go tam jeszcze nie ma
-		if #tab_history == 0 or tab_history[#tab_history] ~= tab_id then
-			table.insert(tab_history, tab_id)
-		end
-
-		-- Utrzymuj historię tylko dwóch ostatnich zakładek
-		if #tab_history > 2 then
-			table.remove(tab_history, 1)
-		end
-	end
-end)
-
-wezterm.on("switch-to-last-tab", function(window, pane)
-	if #tab_history >= 2 then
-		-- Przełącz na przedostatnią zakładkę
-		local last_tab_id = tab_history[#tab_history - 1]
-		window:perform_action(wezterm.action.ActivateTab(last_tab_id), pane)
-	end
-end)
-
 -- Keybindings:
 config.keys = {
 	-- LEADER + t: Create a new tab in the current pane's domain.
@@ -64,7 +37,7 @@ config.keys = {
 		action = wezterm.action.CloseCurrentPane({ confirm = true }),
 	},
 	{
-		mods = "ALT",
+		mods = "LEADER",
 		key = "Tab",
 		action = wezterm.action.EmitEvent("switch-to-last-tab"),
 	},
@@ -173,20 +146,46 @@ config.colors = {
 	},
 }
 
+config.status_update_interval = 100
+
+local tab_history = {}
 wezterm.on("update-right-status", function(window, _)
-	local prefix = ""
+	local tab = window:active_tab()
+	if tab then
+		local tab_id = tab:tab_id()
+		if #tab_history == 0 or tab_history[#tab_history] ~= tab_id then
+			table.insert(tab_history, tab_id)
+		end
+
+		if #tab_history > 2 then
+			table.remove(tab_history, 1)
+		end
+	end
+
+	local prefix = " > "
+	local bg = rp_colors.overlay
+	local fg = rp_colors.base
 
 	if window:leader_is_active() then
 		prefix = " L "
-		-- SOLID_LEFT_ARROW = utf8.char(0xe0b2)
+		bg = rp_colors.rose
+		fg = rp_colors.base
 	end
 
 	window:set_left_status(wezterm.format({
 		{ Attribute = { Intensity = "Bold" } },
-		{ Background = { Color = rp_colors.rose } },
-		{ Foreground = { Color = rp_colors.base } },
+		{ Background = { Color = bg } },
+		{ Foreground = { Color = fg } },
 		{ Text = prefix },
 	}))
+end)
+
+wezterm.on("switch-to-last-tab", function(window, pane)
+	if #tab_history >= 2 then
+		-- Przełącz na przedostatnią zakładkę
+		local last_tab_id = tab_history[#tab_history - 1]
+		window:perform_action(wezterm.action.ActivateTab(last_tab_id), pane)
+	end
 end)
 
 -- window
