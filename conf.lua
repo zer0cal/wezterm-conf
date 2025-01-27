@@ -1,4 +1,5 @@
 local wezterm = require("wezterm")
+local mux = wezterm.mux
 local config = {}
 
 local rp_colors = {
@@ -25,7 +26,6 @@ config.keys = {
 	-- LEADER + q: Close the current pane (with confirmation).
 	-- LEADER + b: Switch to the previous tab.
 	-- LEADER + n: Switch to the next tab.
-	-- LEADER + <number>: Switch to a specific tab (0–9).
 	{
 		mods = "LEADER",
 		key = "t",
@@ -40,6 +40,41 @@ config.keys = {
 		mods = "LEADER",
 		key = "Tab",
 		action = wezterm.action.EmitEvent("switch-to-last-tab"),
+	},
+	{
+		mods = "LEADER",
+		key = "1",
+		action = wezterm.action.ActivateTab(0),
+	},
+	{
+		mods = "LEADER",
+		key = "2",
+		action = wezterm.action.ActivateTab(1),
+	},
+	{
+		mods = "LEADER",
+		key = "3",
+		action = wezterm.action.ActivateTab(2),
+	},
+	{
+		mods = "LEADER",
+		key = "4",
+		action = wezterm.action.ActivateTab(3),
+	},
+	{
+		mods = "LEADER",
+		key = "5",
+		action = wezterm.action.ActivateTab(4),
+	},
+	{
+		mods = "LEADER",
+		key = "6",
+		action = wezterm.action.ActivateTab(5),
+	},
+	{
+		mods = "LEADER",
+		key = "7",
+		action = wezterm.action.ActivateTab(6),
 	},
 	{
 		mods = "LEADER",
@@ -146,6 +181,16 @@ config.colors = {
 	},
 }
 
+-- wezterm.on("gui-startup", function(cmd)
+-- 	local args = {}
+-- 	if cmd then
+-- 		args = cmd.args
+-- 	end
+-- 	local tab, pane, window = mux.spawn_window({
+-- 		cwd = args[0],
+-- 	})
+-- end)
+
 config.status_update_interval = 100
 
 local tab_history = {}
@@ -153,7 +198,17 @@ wezterm.on("update-right-status", function(window, _)
 	local tab = window:active_tab()
 	if tab then
 		local tab_id = tab:tab_id()
-		if #tab_history == 0 or tab_history[#tab_history] ~= tab_id then
+
+		if #tab_history == 0 then
+			table.insert(tab_history, tab_id)
+		end
+
+		if #tab_history == 1 and tab_history[1] ~= tab_id then
+			table.insert(tab_history, tab_id)
+		end
+
+		if #tab_history == 2 and tab_history[2] ~= tab_id then
+			table.remove(tab_history, 1)
 			table.insert(tab_history, tab_id)
 		end
 
@@ -161,10 +216,12 @@ wezterm.on("update-right-status", function(window, _)
 			table.remove(tab_history, 1)
 		end
 	end
+end)
 
+wezterm.on("update-right-status", function(window, _)
 	local prefix = " > "
-	local bg = rp_colors.overlay
-	local fg = rp_colors.base
+	local bg = rp_colors.base
+	local fg = rp_colors.overlay
 
 	if window:leader_is_active() then
 		prefix = " L "
