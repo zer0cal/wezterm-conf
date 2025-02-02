@@ -1,15 +1,18 @@
 local wezterm = require("wezterm")
-local mux = wezterm.mux
 local config = {}
 
-local rp_colors = {
-	base = "#191724",
-	love = "#eb6f92",
-	text = "#908caa",
-	overlay = "#26233a",
-	rose = "#ebbcba",
-	pine = "#31748f",
+local colors = {
+	bg = "#1a1b26",
+	text = "#c0caf5",
+	comment = "565f89",
+	overlay = "#16161e",
+	red = "#f7768e",
+	rose = "#ff9e64",
+	orange = "#f7768e",
 }
+
+config.initial_cols = 110
+config.initial_rows = 30
 
 config.window_decorations = "NONE"
 -- shell
@@ -149,7 +152,7 @@ config.keys = {
 }
 
 -- theme
-config.color_scheme = "rose-pine"
+config.color_scheme = "Tokyo Night"
 
 -- tab_bar
 config.enable_tab_bar = true
@@ -157,26 +160,26 @@ config.integrated_title_button_style = "Windows"
 config.use_fancy_tab_bar = false
 config.colors = {
 	tab_bar = {
-		background = rp_colors.base,
+		background = colors.bg,
 		active_tab = {
-			bg_color = rp_colors.base,
-			fg_color = rp_colors.love,
+			bg_color = colors.bg,
+			fg_color = colors.red,
 		},
 		inactive_tab_hover = {
-			bg_color = rp_colors.overlay,
-			fg_color = rp_colors.text,
+			bg_color = colors.overlay,
+			fg_color = colors.text,
 		},
 		inactive_tab = {
-			bg_color = rp_colors.base,
-			fg_color = rp_colors.text,
+			bg_color = colors.bg,
+			fg_color = colors.text,
 		},
 		new_tab_hover = {
-			bg_color = rp_colors.overlay,
-			fg_color = rp_colors.text,
+			bg_color = colors.overlay,
+			fg_color = colors.text,
 		},
 		new_tab = {
-			bg_color = rp_colors.base,
-			fg_color = rp_colors.text,
+			bg_color = colors.bg,
+			fg_color = colors.text,
 		},
 	},
 }
@@ -220,13 +223,13 @@ end)
 
 wezterm.on("update-right-status", function(window, _)
 	local prefix = " > "
-	local bg = rp_colors.base
-	local fg = rp_colors.overlay
+	local bg = colors.bg
+	local fg = colors.comment
 
 	if window:leader_is_active() then
 		prefix = " L "
-		bg = rp_colors.rose
-		fg = rp_colors.base
+		bg = colors.rose
+		fg = colors.bg
 	end
 
 	window:set_left_status(wezterm.format({
@@ -253,8 +256,8 @@ config.window_frame = {
 	border_right_width = "0px",
 	border_bottom_height = "0px",
 	border_top_height = "0px",
-	active_titlebar_bg = rp_colors.base,
-	inactive_titlebar_bg = rp_colors.base,
+	active_titlebar_bg = colors.base,
+	inactive_titlebar_bg = colors.base,
 }
 -- config.window_background_opacity = 0
 -- config.win32_system_backdrop = "Tabbed"
