@@ -11,7 +11,9 @@ local colors = {
 	overlay = "#16161e",
 	red = "#f7768e",
 	orange = "#ff9e64",
-	red_2 = "#f7768e",
+	green = "#9ece6a",
+	blue = "#7aa2f7",
+	purple = "#bb9af7"
 }
 
 config.initial_cols = 110
@@ -88,27 +90,37 @@ config.colors = {
 config.status_update_interval = 100
 
 -- workspce
-config.default_workspace = "~"
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
 workspace_switcher.zoxide_path = "~/AppData/Local/Microsoft/WinGet/Packages/ajeetdsouza.zoxide_Microsoft.Winget.Source_8wekyb3d8bbwe"
 local workspace_switcher_is_active = false
+local workspace_switcher_is_creator = false
 
 table.insert(keys, { mods = "LEADER", key = "s", action = workspace_switcher.switch_workspace() })
-table.insert(keys, { mods = "LEADER", key = "w", action =  wezterm.action.PromptInputLine({
-			description = "Enter name for new workspace",
-			action = wezterm.action_callback(function(window, pane, line)
-				if line then
-					window:perform_action(wezterm.action.SwitchToWorkspace({ name = line }), pane)
-				end
-			end),
-		})})
+table.insert(keys, { mods = "LEADER", key = "[", action = act.SwitchWorkspaceRelative(1) })
+table.insert(keys, { mods = "LEADER", key = "]", action = act.SwitchWorkspaceRelative(-1) })
+
+table.insert(keys, { mods = "LEADER", key = "w", action = act.Multiple {
+	act.EmitEvent ("open-new-workspace-prompt"),
+	act.PromptInputLine({
+		description = "Enter name for new workspace",
+		action = wezterm.action_callback(function(window, pane, line)
+			workspace_switcher_is_creator = false
+			if line then
+				window:perform_action(wezterm.action.SwitchToWorkspace({ name = line }), pane)
+			end
+		end)
+		})
+	}})
+
+
+wezterm.on("open-new-workspace-prompt", function(_, _) workspace_switcher_is_creator = true end)
 
 wezterm.on("update-right-status", function(window, _)
 	local active_workspace = window:active_workspace()
 	local bg = colors.comment
 
-	if active_workspace ~= "~" then
-		bg = colors.red
+	if active_workspace ~= "default" then
+		bg = colors.purple
 	end
 
 	window:set_right_status(wezterm.format({
@@ -134,12 +146,17 @@ wezterm.on("update-right-status", function(window, _)
 
 	if window:leader_is_active() then
 		prefix = " L "
-		bg = colors.comment
+		bg = colors.blue
 		fg = colors.bg
 	end
 
 	if workspace_switcher_is_active then
+		prefix = " S "
+		bg = colors.red
+		fg = colors.bg
+	end
 
+	if workspace_switcher_is_creator then
 		prefix = " W "
 		bg = colors.red
 		fg = colors.bg
