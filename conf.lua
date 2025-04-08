@@ -1,4 +1,6 @@
 local wezterm = require("wezterm")
+local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
+local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
 local config = {}
 local keys = {}
 local mux = wezterm.mux
@@ -7,7 +9,7 @@ local act = wezterm.action
 local colors = {
 	bg = "#1a1b26",
 	text = "#c0caf5",
-	comment = "565f89",
+	comment = "#565f89",
 	overlay = "#16161e",
 	red = "#f7768e",
 	orange = "#ff9e64",
@@ -18,7 +20,7 @@ local colors = {
 
 config.initial_cols = 110
 config.initial_rows = 30
-
+config.status_update_interval = 100
 config.window_decorations = "NONE"
 
 -- shell
@@ -33,6 +35,7 @@ config.leader = { key = "q", mods = "ALT", timeout_miliseconds = 2000 }
 -- Keybindings:
 table.insert(keys, { mods = "LEADER", key = "t", action = act.SpawnTab("CurrentPaneDomain") })
 table.insert(keys, { mods = "LEADER", key = "q", action = act.CloseCurrentPane({ confirm = true }) })
+table.insert(keys, { mods = "LEADER", key = "Q", action = act.CloseCurrentTab({ confirm = true }) })
 table.insert(keys, { mods = "LEADER", key = "1", action = act.ActivateTab(0) } )
 table.insert(keys, { mods = "LEADER", key = "2", action = act.ActivateTab(1) } )
 table.insert(keys, { mods = "LEADER", key = "3", action = act.ActivateTab(2) } )
@@ -87,19 +90,48 @@ config.colors = {
 	},
 }
 
-config.status_update_interval = 100
 
 -- workspce
-local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
 workspace_switcher.zoxide_path = "~/AppData/Local/Microsoft/WinGet/Packages/ajeetdsouza.zoxide_Microsoft.Winget.Source_8wekyb3d8bbwe"
 local workspace_switcher_is_active = false
 local workspace_switcher_is_creator = false
+
+
+-- wezterm.on('gui-startup', function(cmd)
+--   local args = {}
+--   if cmd then
+--     args = cmd.args
+--   end
+--   table.insert(args, "nu")
+--   table.insert(args, "-l")
+
+--   -- default
+--   local _ , _, _ = mux.spawn_window {
+--     workspace = 'default',
+--     cwd = wezterm.home_dir,
+--     args = args,
+--   }
+
+--   -- wezterm config
+--   local _ , wezterm_conf, _ = mux.spawn_window {
+--     workspace = 'wezterm config',
+--     cwd = wezterm.home_dir .. "/.wezterm",
+--     args = args,
+--  	}
+--  	wezterm_conf:send_text "hx conf.lua\n"
+
+--   -- start with default
+--   mux.set_active_workspace 'default'
+-- end)
 
 table.insert(keys, { mods = "LEADER", key = "s", action = workspace_switcher.switch_workspace() })
 table.insert(keys, { mods = "LEADER", key = "[", action = act.SwitchWorkspaceRelative(1) })
 table.insert(keys, { mods = "LEADER", key = "]", action = act.SwitchWorkspaceRelative(-1) })
 
-table.insert(keys, { mods = "LEADER", key = "w", action = act.Multiple {
+table.insert(keys, {
+	mods = "LEADER",
+	key = "c",
+	action = act.Multiple {
 	act.EmitEvent ("open-new-workspace-prompt"),
 	act.PromptInputLine({
 		description = "Enter name for new workspace",
@@ -110,8 +142,59 @@ table.insert(keys, { mods = "LEADER", key = "w", action = act.Multiple {
 			end
 		end)
 		})
-	}})
+}})
 
+table.insert(keys, {
+	mods = "LEADER",
+	key = "w",
+	action = wezterm.action_callback(function(win, pane)
+  	resurrect.state_manager.save_state(resurrect.workspace_state.get_workspace_state())
+    resurrect.window_state.save_window_action()
+  end),
+})
+
+table.insert(keys, {
+	mods = "LEADER",
+	key = "d",
+	action = wezterm.action_callback(function(win, pane)
+    resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id)
+        resurrect.state_manager.delete_state(id)
+      end,
+      {
+        title = "Delete State",
+        description = "Select State to Delete and press Enter = accept, Esc = cancel, / = filter",
+        fuzzy_description = "Search State to Delete: ",
+        is_fuzzy = true,
+      })
+  end),
+})
+
+table.insert(keys, { mods = "LEADER", key = "r", action = wezterm.action_callback(function(win, pane)
+  resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id, label)
+		local type = string.match(id, "^([^/]+)") -- match before '/'
+    id = string.match(id, "([^/]+)$") -- match after '/'
+    id = string.match(id, "(.+)%..+$") -- remove file extention
+    local opts = {
+    	spawn_in_workspace = true,
+      relative = true,
+      restore_text = true,
+      on_pane_restore = resurrect.tab_state.default_on_pane_restore,
+    }
+    if type == "workspace" then
+      local state = resurrect.state_manager.load_state(id, "workspace")
+      resurrect.workspace_state.restore_workspace(state, opts)
+		  mux.set_active_workspace(id)
+    elseif type == "window" then
+      local state = resurrect.state_manager.load_state(id, "window")
+      resurrect.window_state.restore_window(pane:window(), state, opts)
+		  mux.set_active_workspace(id)
+    elseif type == "tab" then
+      local state = resurrect.state_manager.load_state(id, "tab")
+      resurrect.tab_state.restore_tab(pane:tab(), state, opts)
+		  mux.set_active_workspace(id)
+    end
+   end)
+end)})
 
 wezterm.on("open-new-workspace-prompt", function(_, _) workspace_switcher_is_creator = true end)
 
@@ -146,13 +229,13 @@ wezterm.on("update-right-status", function(window, _)
 
 	if window:leader_is_active() then
 		prefix = " L "
-		bg = colors.blue
+		bg = colors.comment
 		fg = colors.bg
 	end
 
 	if workspace_switcher_is_active then
 		prefix = " S "
-		bg = colors.red
+		bg = colors.green
 		fg = colors.bg
 	end
 
