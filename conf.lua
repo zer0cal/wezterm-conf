@@ -6,18 +6,6 @@ local keys = {}
 local mux = wezterm.mux
 local act = wezterm.action
 
-local colors = {
-	bg = "#1a1b26",
-	text = "#c0caf5",
-	comment = "#565f89",
-	overlay = "#16161e",
-	red = "#f7768e",
-	orange = "#ff9e64",
-	green = "#9ece6a",
-	blue = "#7aa2f7",
-	purple = "#bb9af7"
-}
-
 local tokyonight = {
 	background = "#1a1b26",
 	foreground = "#a9b1d6",
@@ -39,6 +27,21 @@ local tokyonight = {
 	orange = "#ff9e64",
 	red = "#f7768e",
 	magenta = "#ad8ee6",
+}
+
+local colors = {
+	"#bb9af7",
+	"#7aa2f7",
+	"#7dcfff",
+	"#2ac3de",
+	"#b4f9f8",
+	"#73daca",
+	"#9ece6a",
+	"#cfc9c2",
+	"#e0af68",
+	"#ff9e64",
+	"#f7768e",
+	"#ad8ee6",
 }
 
 config.initial_cols = 110
@@ -94,7 +97,7 @@ config.colors = {
 		background = tokyonight.background,
 		active_tab = {
 			bg_color = tokyonight.background,
-			fg_color = tokyonight.purple,
+			fg_color = tokyonight.light_teal,
 		},
 		inactive_tab_hover = {
 			bg_color = tokyonight.black,
@@ -211,13 +214,19 @@ end)
 
 wezterm.on("open-new-workspace-prompt", function(_, _) workspace_create_is_active = true end)
 
+local function hash(str)
+    local h = 5381
+
+    for i = 1, #str do
+       h = h*32 + h + str:byte(i)
+    end
+    return h
+end
+
 wezterm.on("update-right-status", function(window, _)
 	local active_workspace = window:active_workspace()
-	local bg = tokyonight.comment
-
-	if active_workspace ~= "default" then
-		bg = tokyonight.purple
-	end
+	local num = (hash(active_workspace) % #colors) + 1
+	local bg = colors[num]
 
 	window:set_right_status(wezterm.format({
 	  { Attribute = { Intensity = "Bold" } },
