@@ -18,6 +18,29 @@ local colors = {
 	purple = "#bb9af7"
 }
 
+local tokyonight = {
+	background = "#1a1b26",
+	foreground = "#a9b1d6",
+	text = "#9aa6ce",
+	comment = "#565f89",
+	terminal_white = "#c0caf5",
+	terminal_black = "#414868",
+	black = "#32344a",
+	white = "#787c99",
+	purple = "#bb9af7",
+	blue = "#7aa2f7",
+	light_blue = "#7dcfff",
+	teal_b = "#2ac3de",
+	light_teal = "#b4f9f8",
+	teal_g = "#73daca",
+	green = "#9ece6a",
+	yellow = "#cfc9c2",
+	light_orange = "#e0af68",
+	orange = "#ff9e64",
+	red = "#f7768e",
+	magenta = "#ad8ee6",
+}
+
 config.initial_cols = 110
 config.initial_rows = 30
 config.status_update_interval = 100
@@ -64,65 +87,47 @@ config.color_scheme = "Tokyo Night"
 config.enable_tab_bar = true
 config.integrated_title_button_style = "Windows"
 config.use_fancy_tab_bar = false
+config.tab_max_width = 60
+
 config.colors = {
 	tab_bar = {
-		background = colors.bg,
+		background = tokyonight.background,
 		active_tab = {
-			bg_color = colors.bg,
-			fg_color = colors.text,
+			bg_color = tokyonight.background,
+			fg_color = tokyonight.purple,
 		},
 		inactive_tab_hover = {
-			bg_color = colors.overlay,
-			fg_color = colors.comment,
+			bg_color = tokyonight.black,
+			fg_color = tokyonight.comment,
 		},
 		inactive_tab = {
-			bg_color = colors.bg,
-			fg_color = colors.comment,
+			bg_color = tokyonight.background,
+			fg_color = tokyonight.comment,
 		},
 		new_tab_hover = {
-			bg_color = colors.overlay,
-			fg_color = colors.comment,
+			bg_color = tokyonight.black,
+			fg_color = tokyonight.comment,
 		},
 		new_tab = {
-			bg_color = colors.bg,
-			fg_color = colors.comment,
+			bg_color = tokyonight.background,
+			fg_color = tokyonight.comment,
 		},
 	},
 }
 
+wezterm.on(
+  'format-tab-title',
+  function(tab, tabs, panes, config, hover, max_width)
+    return ' [' .. tab.tab_index + 1 .. '] ' .. tab.active_pane.title .. ' '
+  end
+)
 
 -- workspce
 workspace_switcher.zoxide_path = "~/AppData/Local/Microsoft/WinGet/Packages/ajeetdsouza.zoxide_Microsoft.Winget.Source_8wekyb3d8bbwe"
-local workspace_switcher_is_active = false
-local workspace_switcher_is_creator = false
-
-
--- wezterm.on('gui-startup', function(cmd)
---   local args = {}
---   if cmd then
---     args = cmd.args
---   end
---   table.insert(args, "nu")
---   table.insert(args, "-l")
-
---   -- default
---   local _ , _, _ = mux.spawn_window {
---     workspace = 'default',
---     cwd = wezterm.home_dir,
---     args = args,
---   }
-
---   -- wezterm config
---   local _ , wezterm_conf, _ = mux.spawn_window {
---     workspace = 'wezterm config',
---     cwd = wezterm.home_dir .. "/.wezterm",
---     args = args,
---  	}
---  	wezterm_conf:send_text "hx conf.lua\n"
-
---   -- start with default
---   mux.set_active_workspace 'default'
--- end)
+local workspace_switch_is_active = false
+local workspace_create_is_active = false
+local workspace_delete_is_active = false
+local workspace_resurrect_is_active = false
 
 table.insert(keys, { mods = "LEADER", key = "s", action = workspace_switcher.switch_workspace() })
 table.insert(keys, { mods = "LEADER", key = "[", action = act.SwitchWorkspaceRelative(1) })
@@ -136,7 +141,7 @@ table.insert(keys, {
 	act.PromptInputLine({
 		description = "Enter name for new workspace",
 		action = wezterm.action_callback(function(window, pane, line)
-			workspace_switcher_is_creator = false
+			workspace_create_is_active = false
 			if line then
 				window:perform_action(wezterm.action.SwitchToWorkspace({ name = line }), pane)
 			end
@@ -147,7 +152,7 @@ table.insert(keys, {
 table.insert(keys, {
 	mods = "LEADER",
 	key = "w",
-	action = wezterm.action_callback(function(win, pane)
+	action = wezterm.action_callback(function(_, _)
   	resurrect.state_manager.save_state(resurrect.workspace_state.get_workspace_state())
     resurrect.window_state.save_window_action()
   end),
@@ -157,6 +162,7 @@ table.insert(keys, {
 	mods = "LEADER",
 	key = "d",
 	action = wezterm.action_callback(function(win, pane)
+		workspace_delete_is_active = true
     resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id)
         resurrect.state_manager.delete_state(id)
       end,
@@ -165,12 +171,14 @@ table.insert(keys, {
         description = "Select State to Delete and press Enter = accept, Esc = cancel, / = filter",
         fuzzy_description = "Search State to Delete: ",
         is_fuzzy = true,
-      })
-  end),
+	    }
+	  )
+	end),
 })
 
 table.insert(keys, { mods = "LEADER", key = "r", action = wezterm.action_callback(function(win, pane)
-  resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id, label)
+	workspace_resurrect_is_active = true
+  resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id, _)
 		local type = string.match(id, "^([^/]+)") -- match before '/'
     id = string.match(id, "([^/]+)$") -- match after '/'
     id = string.match(id, "(.+)%..+$") -- remove file extention
@@ -196,53 +204,70 @@ table.insert(keys, { mods = "LEADER", key = "r", action = wezterm.action_callbac
    end)
 end)})
 
-wezterm.on("open-new-workspace-prompt", function(_, _) workspace_switcher_is_creator = true end)
+wezterm.on("resurrect.fuzzy_loader.fuzzy_load.finished", function(_, _)
+	workspace_resurrect_is_active = false
+	workspace_delete_is_active = false
+end)
+
+wezterm.on("open-new-workspace-prompt", function(_, _) workspace_create_is_active = true end)
 
 wezterm.on("update-right-status", function(window, _)
 	local active_workspace = window:active_workspace()
-	local bg = colors.comment
+	local bg = tokyonight.comment
 
 	if active_workspace ~= "default" then
-		bg = colors.purple
+		bg = tokyonight.purple
 	end
 
 	window:set_right_status(wezterm.format({
 	  { Attribute = { Intensity = "Bold" } },
 		{ Background = { Color = bg } },
-		{ Foreground = { Color = colors.bg } },
+		{ Foreground = { Color = tokyonight.background } },
 		{ Text = " " .. active_workspace .. " " },
 	}))
 end)
 
-wezterm.on("smart_workspace_switcher.workspace_switcher.start", function(_, _) workspace_switcher_is_active = true end)
-wezterm.on("smart_workspace_switcher.workspace_switcher.canceled", function(_, _) workspace_switcher_is_active = false end)
-wezterm.on("smart_workspace_switcher.workspace_switcher.selected", function(_, _) workspace_switcher_is_active = false end)
-wezterm.on("smart_workspace_switcher.workspace_switcher.created", function(_, _) workspace_switcher_is_active = false end)
-wezterm.on("smart_workspace_switcher.workspace_switcher.chosen", function(_, _) workspace_switcher_is_active = false end)
-wezterm.on("smart_workspace_switcher.workspace_switcher.switched_to_prev", function(_, _) workspace_switcher_is_active = false end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.start", function(_, _) workspace_switch_is_active = true end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.canceled", function(_, _) workspace_switch_is_active = false end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.selected", function(_, _) workspace_switch_is_active = false end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.created", function(_, _) workspace_switch_is_active = false end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.chosen", function(_, _) workspace_switch_is_active = false end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.switched_to_prev", function(_, _) workspace_switch_is_active = false end)
 
 -- leader indicator
 wezterm.on("update-right-status", function(window, _)
 	local prefix = " > "
-	local bg = colors.bg
-	local fg = colors.comment
+	local bg = tokyonight.background
+	local fg = tokyonight.comment
 
 	if window:leader_is_active() then
 		prefix = " L "
-		bg = colors.comment
-		fg = colors.bg
+		bg = tokyonight.blue
+		fg = tokyonight.background
 	end
 
-	if workspace_switcher_is_active then
+	if workspace_switch_is_active then
 		prefix = " S "
-		bg = colors.green
-		fg = colors.bg
+		bg = tokyonight.orange
+		fg = tokyonight.background
 	end
 
-	if workspace_switcher_is_creator then
-		prefix = " W "
-		bg = colors.red
-		fg = colors.bg
+	if workspace_create_is_active then
+		prefix = " C "
+		bg = tokyonight.green
+		fg = tokyonight.background
+	end
+
+	if workspace_delete_is_active then
+		prefix = " D "
+		bg = tokyonight.red
+		fg = tokyonight.background
+	end
+
+	if workspace_resurrect_is_active then
+		prefix = " R "
+		bg = tokyonight.teal_g
+		fg = tokyonight.background
 	end
 
 	window:set_left_status(wezterm.format({
