@@ -92,32 +92,6 @@ config.integrated_title_button_style = "Windows"
 config.use_fancy_tab_bar = false
 config.tab_max_width = 60
 
-config.colors = {
-	tab_bar = {
-		background = tokyonight.background,
-		active_tab = {
-			bg_color = tokyonight.background,
-			fg_color = tokyonight.light_teal,
-		},
-		inactive_tab_hover = {
-			bg_color = tokyonight.black,
-			fg_color = tokyonight.comment,
-		},
-		inactive_tab = {
-			bg_color = tokyonight.background,
-			fg_color = tokyonight.comment,
-		},
-		new_tab_hover = {
-			bg_color = tokyonight.black,
-			fg_color = tokyonight.comment,
-		},
-		new_tab = {
-			bg_color = tokyonight.background,
-			fg_color = tokyonight.comment,
-		},
-	},
-}
-
 wezterm.on(
   'format-tab-title',
   function(tab, tabs, panes, config, hover, max_width)
@@ -227,14 +201,31 @@ wezterm.on("update-right-status", function(window, _)
 	local active_workspace = window:active_workspace()
 	local num = (hash(active_workspace) % #colors) + 1
 	local bg = colors[num]
-	local overrides = {
+		local overrides = {
 		colors =  {
 			tab_bar = {
+				background = tokyonight.background,
 				active_tab = {
 					bg_color = tokyonight.background,
 					fg_color = bg,
 				},
-			},
+				inactive_tab_hover = {
+					bg_color = tokyonight.black,
+					fg_color = tokyonight.comment,
+				},
+				inactive_tab = {
+					bg_color = tokyonight.background,
+					fg_color = tokyonight.comment,
+				},
+				new_tab_hover = {
+					bg_color = tokyonight.black,
+					fg_color = tokyonight.comment,
+				},
+				new_tab = {
+					bg_color = tokyonight.background,
+					fg_color = tokyonight.comment,
+				}
+			}
 		}
 	}
 
