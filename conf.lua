@@ -227,6 +227,18 @@ wezterm.on("update-right-status", function(window, _)
 	local active_workspace = window:active_workspace()
 	local num = (hash(active_workspace) % #colors) + 1
 	local bg = colors[num]
+	local overrides = {
+		colors =  {
+			tab_bar = {
+				active_tab = {
+					bg_color = tokyonight.background,
+					fg_color = bg,
+				},
+			},
+		}
+	}
+
+	window:set_config_overrides(overrides)
 
 	window:set_right_status(wezterm.format({
 	  { Attribute = { Intensity = "Bold" } },
