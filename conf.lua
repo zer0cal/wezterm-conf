@@ -29,7 +29,7 @@ local tokyonight = {
 	magenta = "#ad8ee6",
 }
 
-local colors = {
+local colors_tab = {
 	"#bb9af7",
 	"#7aa2f7",
 	"#7dcfff",
@@ -199,8 +199,8 @@ end
 
 wezterm.on("update-right-status", function(window, _)
 	local active_workspace = window:active_workspace()
-	local num = (hash(active_workspace) % #colors) + 1
-	local bg = colors[num]
+	local num = (hash(active_workspace) % #colors_tab) + 1
+	local bg = colors_tab[num]
 		local overrides = {
 		colors =  {
 			tab_bar = {
@@ -298,9 +298,12 @@ config.window_frame = {
 	border_right_width = "0px",
 	border_bottom_height = "0px",
 	border_top_height = "0px",
-	active_titlebar_bg = colors.base,
-	inactive_titlebar_bg = colors.base,
+	active_titlebar_bg = tokyonight.background,
+	inactive_titlebar_bg = tokyonight.black,
 }
+
+-- config.window_background_opacity = 0.2
+-- config.win32_system_backdrop = 'Tabbed'
 
 config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 
@@ -313,7 +316,7 @@ config.window_padding = {
 
 -- font
 config.font = wezterm.font("JetBrainsMono Nerd Font Mono", { weight = "Bold" })
-config.font_size = 15.0
+config.font_size = 16.0
 
 config.keys = keys
 
