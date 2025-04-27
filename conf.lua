@@ -95,7 +95,7 @@ config.tab_max_width = 60
 wezterm.on(
   'format-tab-title',
   function(tab, tabs, panes, config, hover, max_width)
-    return ' [' .. tab.tab_index + 1 .. '] ' .. tab.active_pane.title .. ' '
+    return ' ' .. tab.tab_index + 1 .. ': ' .. tab.active_pane.title .. ' '
   end
 )
 
