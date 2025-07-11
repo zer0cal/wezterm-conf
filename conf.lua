@@ -1,4 +1,5 @@
 local wezterm = require("wezterm")
+local sessionizer = require("sessionizer").setup
 local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
 local config = {}
@@ -56,22 +57,22 @@ config.check_for_updates = true
 config.check_for_updates_interval_seconds = 86400
 
 -- Leader Key:
-config.leader = { key = "q", mods = "ALT", timeout_miliseconds = 2000 }
+config.leader = { mods = "ALT", key = "q", timeout_miliseconds = 2000 }
 
 -- Keybindings:
 table.insert(keys, { mods = "LEADER", key = "t", action = act.SpawnTab("CurrentPaneDomain") })
 table.insert(keys, { mods = "LEADER", key = "q", action = act.CloseCurrentPane({ confirm = true }) })
 table.insert(keys, { mods = "LEADER", key = "Q", action = act.CloseCurrentTab({ confirm = true }) })
-table.insert(keys, { mods = "LEADER", key = "1", action = act.ActivateTab(0) } )
-table.insert(keys, { mods = "LEADER", key = "2", action = act.ActivateTab(1) } )
-table.insert(keys, { mods = "LEADER", key = "3", action = act.ActivateTab(2) } )
-table.insert(keys, { mods = "LEADER", key = "4", action = act.ActivateTab(3) } )
-table.insert(keys, { mods = "LEADER", key = "5", action = act.ActivateTab(4) } )
-table.insert(keys, { mods = "LEADER", key = "6", action = act.ActivateTab(5) } )
-table.insert(keys, { mods = "LEADER", key = "7", action = act.ActivateTab(6) } )
-table.insert(keys, { mods = "LEADER", key = "8", action = act.ActivateTab(7) } )
-table.insert(keys, { mods = "LEADER", key = "9", action = act.ActivateTab(8) } )
-table.insert(keys, { mods = "LEADER", key = "0", action = act.ActivateTab(9) } )
+table.insert(keys, { mods = "LEADER", key = "1", action = act.ActivateTab(0) })
+table.insert(keys, { mods = "LEADER", key = "2", action = act.ActivateTab(1) })
+table.insert(keys, { mods = "LEADER", key = "3", action = act.ActivateTab(2) })
+table.insert(keys, { mods = "LEADER", key = "4", action = act.ActivateTab(3) })
+table.insert(keys, { mods = "LEADER", key = "5", action = act.ActivateTab(4) })
+table.insert(keys, { mods = "LEADER", key = "6", action = act.ActivateTab(5) })
+table.insert(keys, { mods = "LEADER", key = "7", action = act.ActivateTab(6) })
+table.insert(keys, { mods = "LEADER", key = "8", action = act.ActivateTab(7) })
+table.insert(keys, { mods = "LEADER", key = "9", action = act.ActivateTab(8) })
+table.insert(keys, { mods = "LEADER", key = "0", action = act.ActivateTab(9) })
 table.insert(keys, { mods = "LEADER", key = "\\", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) })
 table.insert(keys, { mods = "LEADER", key = "-", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) })
 table.insert(keys, { mods = "LEADER", key = "h", action = act.ActivatePaneDirection("Left") })
@@ -92,15 +93,13 @@ config.integrated_title_button_style = "Windows"
 config.use_fancy_tab_bar = false
 config.tab_max_width = 60
 
-wezterm.on(
-  'format-tab-title',
-  function(tab, tabs, panes, config, hover, max_width)
-    return ' ' .. tab.tab_index + 1 .. ': ' .. tab.active_pane.title .. ' '
-  end
-)
+wezterm.on("format-tab-title", function(tab, _, _, _, _, _)
+	return " " .. tab.tab_index + 1 .. " " .. tab.active_pane.title .. " "
+end)
 
 -- workspce
-workspace_switcher.zoxide_path = "~/AppData/Local/Microsoft/WinGet/Packages/ajeetdsouza.zoxide_Microsoft.Winget.Source_8wekyb3d8bbwe"
+workspace_switcher.zoxide_path =
+	"~/AppData/Local/Microsoft/WinGet/Packages/ajeetdsouza.zoxide_Microsoft.Winget.Source_8wekyb3d8bbwe"
 local workspace_switch_is_active = false
 local workspace_create_is_active = false
 local workspace_delete_is_active = false
@@ -113,26 +112,27 @@ table.insert(keys, { mods = "LEADER", key = "]", action = act.SwitchWorkspaceRel
 table.insert(keys, {
 	mods = "LEADER",
 	key = "c",
-	action = act.Multiple {
-	act.EmitEvent ("open-new-workspace-prompt"),
-	act.PromptInputLine({
-		description = "Enter name for new workspace",
-		action = wezterm.action_callback(function(window, pane, line)
-			workspace_create_is_active = false
-			if line then
-				window:perform_action(wezterm.action.SwitchToWorkspace({ name = line }), pane)
-			end
-		end)
-		})
-}})
+	action = act.Multiple({
+		act.EmitEvent("open-new-workspace-prompt"),
+		act.PromptInputLine({
+			description = "Enter name for new workspace",
+			action = wezterm.action_callback(function(window, pane, line)
+				workspace_create_is_active = false
+				if line then
+					window:perform_action(wezterm.action.SwitchToWorkspace({ name = line }), pane)
+				end
+			end),
+		}),
+	}),
+})
 
 table.insert(keys, {
 	mods = "LEADER",
 	key = "w",
 	action = wezterm.action_callback(function(_, _)
-  	resurrect.state_manager.save_state(resurrect.workspace_state.get_workspace_state())
-    resurrect.window_state.save_window_action()
-  end),
+		resurrect.state_manager.save_state(resurrect.workspace_state.get_workspace_state())
+		resurrect.window_state.save_window_action()
+	end),
 })
 
 table.insert(keys, {
@@ -140,69 +140,73 @@ table.insert(keys, {
 	key = "d",
 	action = wezterm.action_callback(function(win, pane)
 		workspace_delete_is_active = true
-    resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id)
-        resurrect.state_manager.delete_state(id)
-      end,
-      {
-        title = "Delete State",
-        description = "Select State to Delete and press Enter = accept, Esc = cancel, / = filter",
-        fuzzy_description = "Search State to Delete: ",
-        is_fuzzy = true,
-	    }
-	  )
+		resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id)
+			resurrect.state_manager.delete_state(id)
+		end, {
+			title = "Delete State",
+			description = "Select State to Delete and press Enter = accept, Esc = cancel, / = filter",
+			fuzzy_description = "Search State to Delete: ",
+			is_fuzzy = true,
+		})
 	end),
 })
 
-table.insert(keys, { mods = "LEADER", key = "r", action = wezterm.action_callback(function(win, pane)
-	workspace_resurrect_is_active = true
-  resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id, _)
-		local type = string.match(id, "^([^/]+)") -- match before '/'
-    id = string.match(id, "([^/]+)$") -- match after '/'
-    id = string.match(id, "(.+)%..+$") -- remove file extention
-    local opts = {
-    	spawn_in_workspace = true,
-      relative = true,
-      restore_text = true,
-      on_pane_restore = resurrect.tab_state.default_on_pane_restore,
-    }
-    if type == "workspace" then
-      local state = resurrect.state_manager.load_state(id, "workspace")
-      resurrect.workspace_state.restore_workspace(state, opts)
-		  mux.set_active_workspace(id)
-    elseif type == "window" then
-      local state = resurrect.state_manager.load_state(id, "window")
-      resurrect.window_state.restore_window(pane:window(), state, opts)
-		  mux.set_active_workspace(id)
-    elseif type == "tab" then
-      local state = resurrect.state_manager.load_state(id, "tab")
-      resurrect.tab_state.restore_tab(pane:tab(), state, opts)
-		  mux.set_active_workspace(id)
-    end
-   end)
-end)})
+table.insert(keys, {
+	mods = "LEADER",
+	key = "r",
+	action = wezterm.action_callback(function(win, pane)
+		workspace_resurrect_is_active = true
+		resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id, _)
+			local type = string.match(id, "^([^/]+)") -- match before '/'
+			id = string.match(id, "([^/]+)$") -- match after '/'
+			id = string.match(id, "(.+)%..+$") -- remove file extention
+			local opts = {
+				spawn_in_workspace = true,
+				relative = true,
+				restore_text = true,
+				on_pane_restore = resurrect.tab_state.default_on_pane_restore,
+			}
+			if type == "workspace" then
+				local state = resurrect.state_manager.load_state(id, "workspace")
+				resurrect.workspace_state.restore_workspace(state, opts)
+				mux.set_active_workspace(id)
+			elseif type == "window" then
+				local state = resurrect.state_manager.load_state(id, "window")
+				resurrect.window_state.restore_window(pane:window(), state, opts)
+				mux.set_active_workspace(id)
+			elseif type == "tab" then
+				local state = resurrect.state_manager.load_state(id, "tab")
+				resurrect.tab_state.restore_tab(pane:tab(), state, opts)
+				mux.set_active_workspace(id)
+			end
+		end)
+	end),
+})
 
 wezterm.on("resurrect.fuzzy_loader.fuzzy_load.finished", function(_, _)
 	workspace_resurrect_is_active = false
 	workspace_delete_is_active = false
 end)
 
-wezterm.on("open-new-workspace-prompt", function(_, _) workspace_create_is_active = true end)
+wezterm.on("open-new-workspace-prompt", function(_, _)
+	workspace_create_is_active = true
+end)
 
 local function hash(str)
-    local h = 5381
+	local h = 5381
 
-    for i = 1, #str do
-       h = h*32 + h + str:byte(i)
-    end
-    return h
+	for i = 1, #str do
+		h = h * #colors_tab + h + str:byte(i)
+	end
+	return h
 end
 
 wezterm.on("update-right-status", function(window, _)
 	local active_workspace = window:active_workspace()
 	local num = (hash(active_workspace) % #colors_tab) + 1
 	local bg = colors_tab[num]
-		local overrides = {
-		colors =  {
+	local overrides = {
+		colors = {
 			tab_bar = {
 				background = tokyonight.background,
 				active_tab = {
@@ -224,27 +228,39 @@ wezterm.on("update-right-status", function(window, _)
 				new_tab = {
 					bg_color = tokyonight.background,
 					fg_color = tokyonight.comment,
-				}
-			}
-		}
+				},
+			},
+		},
 	}
 
 	window:set_config_overrides(overrides)
 
 	window:set_right_status(wezterm.format({
-	  { Attribute = { Intensity = "Bold" } },
+		{ Attribute = { Intensity = "Bold" } },
 		{ Background = { Color = bg } },
 		{ Foreground = { Color = tokyonight.background } },
 		{ Text = " " .. active_workspace .. " " },
 	}))
 end)
 
-wezterm.on("smart_workspace_switcher.workspace_switcher.start", function(_, _) workspace_switch_is_active = true end)
-wezterm.on("smart_workspace_switcher.workspace_switcher.canceled", function(_, _) workspace_switch_is_active = false end)
-wezterm.on("smart_workspace_switcher.workspace_switcher.selected", function(_, _) workspace_switch_is_active = false end)
-wezterm.on("smart_workspace_switcher.workspace_switcher.created", function(_, _) workspace_switch_is_active = false end)
-wezterm.on("smart_workspace_switcher.workspace_switcher.chosen", function(_, _) workspace_switch_is_active = false end)
-wezterm.on("smart_workspace_switcher.workspace_switcher.switched_to_prev", function(_, _) workspace_switch_is_active = false end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.start", function(_, _)
+	workspace_switch_is_active = true
+end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.canceled", function(_, _)
+	workspace_switch_is_active = false
+end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.selected", function(_, _)
+	workspace_switch_is_active = false
+end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.created", function(_, _)
+	workspace_switch_is_active = false
+end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.chosen", function(_, _)
+	workspace_switch_is_active = false
+end)
+wezterm.on("smart_workspace_switcher.workspace_switcher.switched_to_prev", function(_, _)
+	workspace_switch_is_active = false
+end)
 
 -- leader indicator
 wezterm.on("update-right-status", function(window, _)
@@ -315,7 +331,7 @@ config.window_padding = {
 }
 
 -- font
-config.font = wezterm.font("JetBrainsMono Nerd Font Mono", { weight = "Bold" })
+config.font = wezterm.font("JetBrainsMono Nerd Font Mono", { weight = "Light" })
 config.font_size = 16.0
 
 config.keys = keys
