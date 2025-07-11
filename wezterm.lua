@@ -7,42 +7,93 @@ local keys = {}
 local mux = wezterm.mux
 local act = wezterm.action
 
-local tokyonight = {
-	background = "#1a1b26",
-	foreground = "#a9b1d6",
-	text = "#9aa6ce",
-	comment = "#565f89",
-	terminal_white = "#c0caf5",
-	terminal_black = "#414868",
-	black = "#32344a",
-	white = "#787c99",
-	purple = "#bb9af7",
-	blue = "#7aa2f7",
-	light_blue = "#7dcfff",
-	teal_b = "#2ac3de",
-	light_teal = "#b4f9f8",
-	teal_g = "#73daca",
-	green = "#9ece6a",
-	yellow = "#cfc9c2",
-	light_orange = "#e0af68",
-	orange = "#ff9e64",
-	red = "#f7768e",
-	magenta = "#ad8ee6",
+-- local tokyonight = {
+-- 	background = "#1a1b26",
+-- 	foreground = "#a9b1d6",
+-- 	text = "#9aa6ce",
+-- 	comment = "#565f89",
+-- 	terminal_white = "#c0caf5",
+-- 	terminal_black = "#414868",
+-- 	black = "#32344a",
+-- 	white = "#787c99",
+-- 	purple = "#bb9af7",
+-- 	blue = "#7aa2f7",
+-- 	light_blue = "#7dcfff",
+-- 	teal_b = "#2ac3de",
+-- 	light_teal = "#b4f9f8",
+-- 	teal_g = "#73daca",
+-- 	green = "#9ece6a",
+-- 	yellow = "#cfc9c2",
+-- 	light_orange = "#e0af68",
+-- 	orange = "#ff9e64",
+-- 	red = "#f7768e",
+-- 	magenta = "#ad8ee6",
+-- }
+
+-- name: 'Kanagawa Wave'
+-- author: ''             # 'AUTHOR NAME (http://WEBSITE.com)'
+-- variant: ''            # dark or light
+--
+-- color_01: '#090618'    # Black (Host)
+-- color_02: '#C34043'     Red (Syntax string)
+-- color_03: '#76946A'     Green (Command)
+-- color_04: '#C0A36E'     Yellow (Command second)
+-- color_05: '#7E9CD8'     Blue (Path)
+-- color_06: '#957FB8'     Magenta (Syntax var)
+-- color_07: '#6A9589'    # Cyan (Prompt)
+-- color_08: '#C8C093'    # White
+--
+-- color_09: '#727169'    # Bright Black
+-- color_10: '#E82424'     Bright Red (Command error)
+-- color_11: '#98BB6C'     Bright Green (Exec)
+-- color_12: '#E6C384'     Bright Yellow
+-- color_13: '#7FB4CA'     Bright Blue (Folder)
+-- color_14: '#938AA9'     Bright Magenta
+-- color_15: '#7AA89F'    # Bright Cyan
+-- color_16: '#DCD7BA'    # Bright White
+--
+-- background: '#1F1F28'  # Background
+-- foreground: '#DCD7BA'  # Foreground (Text)
+--
+-- cursor: '#DCD7BA'      # Cursor
+local kanagawa = {
+	background = "#1F1F28",
+	foreground = "#DCD7BA",
+	text = "#DCD7BA",
+	comment = "#727169",
+	terminal_white = "#C8C093",
+	terminal_black = "#090618",
+	black = "#292D3E",
+	white = "#C8C093",
+	purple = "#938AA9",
+	blue = "#7E9CD8",
+	light_blue = "#7FB4CA",
+	teal_b = "#6A9589",
+	light_teal = "#7AA89F",
+	teal_g = "#98BB6C",
+	green = "#76946A",
+	yellow = "#C0A36E",
+	light_orange = "#E6C384",
+	orange = "#E82424",
+	red = "#C34043",
+	magenta = "#957FB8",
 }
 
+local setted_colors = kanagawa
+
 local colors_tab = {
-	"#bb9af7",
-	"#7aa2f7",
-	"#7dcfff",
-	"#2ac3de",
-	"#b4f9f8",
-	"#73daca",
-	"#9ece6a",
-	"#cfc9c2",
-	"#e0af68",
-	"#ff9e64",
-	"#f7768e",
-	"#ad8ee6",
+	kanagawa.purple,
+	kanagawa.blue,
+	kanagawa.light_blue,
+	kanagawa.teal_b,
+	kanagawa.light_teal,
+	kanagawa.teal_g,
+	kanagawa.green,
+	kanagawa.yellow,
+	kanagawa.light_orange,
+	kanagawa.orange,
+	kanagawa.red,
+	kanagawa.magenta,
 }
 
 config.initial_cols = 110
@@ -85,7 +136,8 @@ table.insert(keys, { mods = "LEADER", key = "DownArrow", action = act.AdjustPane
 table.insert(keys, { mods = "LEADER", key = "UpArrow", action = act.AdjustPaneSize({ "Up", 5 }) })
 
 -- theme
-config.color_scheme = "Tokyo Night"
+-- config.color_scheme = "Tokyo Night"
+config.color_scheme = "Kanagawa (Gogh)"
 
 -- tab_bar
 config.enable_tab_bar = true
@@ -208,26 +260,26 @@ wezterm.on("update-right-status", function(window, _)
 	local overrides = {
 		colors = {
 			tab_bar = {
-				background = tokyonight.background,
+				background = setted_colors.background,
 				active_tab = {
-					bg_color = tokyonight.background,
+					bg_color = setted_colors.background,
 					fg_color = bg,
 				},
 				inactive_tab_hover = {
-					bg_color = tokyonight.black,
-					fg_color = tokyonight.comment,
+					bg_color = setted_colors.black,
+					fg_color = setted_colors.comment,
 				},
 				inactive_tab = {
-					bg_color = tokyonight.background,
-					fg_color = tokyonight.comment,
+					bg_color = setted_colors.background,
+					fg_color = setted_colors.comment,
 				},
 				new_tab_hover = {
-					bg_color = tokyonight.black,
-					fg_color = tokyonight.comment,
+					bg_color = setted_colors.black,
+					fg_color = setted_colors.comment,
 				},
 				new_tab = {
-					bg_color = tokyonight.background,
-					fg_color = tokyonight.comment,
+					bg_color = setted_colors.background,
+					fg_color = setted_colors.comment,
 				},
 			},
 		},
@@ -238,7 +290,7 @@ wezterm.on("update-right-status", function(window, _)
 	window:set_right_status(wezterm.format({
 		{ Attribute = { Intensity = "Bold" } },
 		{ Background = { Color = bg } },
-		{ Foreground = { Color = tokyonight.background } },
+		{ Foreground = { Color = setted_colors.background } },
 		{ Text = " " .. active_workspace .. " " },
 	}))
 end)
@@ -265,37 +317,37 @@ end)
 -- leader indicator
 wezterm.on("update-right-status", function(window, _)
 	local prefix = " > "
-	local bg = tokyonight.background
-	local fg = tokyonight.comment
+	local bg = setted_colors.background
+	local fg = setted_colors.comment
 
 	if window:leader_is_active() then
 		prefix = " L "
-		bg = tokyonight.blue
-		fg = tokyonight.background
+		bg = setted_colors.blue
+		fg = setted_colors.background
 	end
 
 	if workspace_switch_is_active then
 		prefix = " S "
-		bg = tokyonight.orange
-		fg = tokyonight.background
+		bg = setted_colors.orange
+		fg = setted_colors.background
 	end
 
 	if workspace_create_is_active then
 		prefix = " C "
-		bg = tokyonight.green
-		fg = tokyonight.background
+		bg = setted_colors.green
+		fg = setted_colors.background
 	end
 
 	if workspace_delete_is_active then
 		prefix = " D "
-		bg = tokyonight.red
-		fg = tokyonight.background
+		bg = setted_colors.red
+		fg = setted_colors.background
 	end
 
 	if workspace_resurrect_is_active then
 		prefix = " R "
-		bg = tokyonight.teal_g
-		fg = tokyonight.background
+		bg = setted_colors.teal_g
+		fg = setted_colors.background
 	end
 
 	window:set_left_status(wezterm.format({
@@ -314,8 +366,8 @@ config.window_frame = {
 	border_right_width = "0px",
 	border_bottom_height = "0px",
 	border_top_height = "0px",
-	active_titlebar_bg = tokyonight.background,
-	inactive_titlebar_bg = tokyonight.black,
+	active_titlebar_bg = setted_colors.background,
+	inactive_titlebar_bg = setted_colors.black,
 }
 
 -- config.window_background_opacity = 0.2
