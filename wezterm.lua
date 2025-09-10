@@ -7,55 +7,6 @@ local keys = {}
 local mux = wezterm.mux
 local act = wezterm.action
 
--- local tokyonight = {
--- 	background = "#1a1b26",
--- 	foreground = "#a9b1d6",
--- 	text = "#9aa6ce",
--- 	comment = "#565f89",
--- 	terminal_white = "#c0caf5",
--- 	terminal_black = "#414868",
--- 	black = "#32344a",
--- 	white = "#787c99",
--- 	purple = "#bb9af7",
--- 	blue = "#7aa2f7",
--- 	light_blue = "#7dcfff",
--- 	teal_b = "#2ac3de",
--- 	light_teal = "#b4f9f8",
--- 	teal_g = "#73daca",
--- 	green = "#9ece6a",
--- 	yellow = "#cfc9c2",
--- 	light_orange = "#e0af68",
--- 	orange = "#ff9e64",
--- 	red = "#f7768e",
--- 	magenta = "#ad8ee6",
--- }
-
--- name: 'Kanagawa Wave'
--- author: ''             # 'AUTHOR NAME (http://WEBSITE.com)'
--- variant: ''            # dark or light
---
--- color_01: '#090618'    # Black (Host)
--- color_02: '#C34043'     Red (Syntax string)
--- color_03: '#76946A'     Green (Command)
--- color_04: '#C0A36E'     Yellow (Command second)
--- color_05: '#7E9CD8'     Blue (Path)
--- color_06: '#957FB8'     Magenta (Syntax var)
--- color_07: '#6A9589'    # Cyan (Prompt)
--- color_08: '#C8C093'    # White
---
--- color_09: '#727169'    # Bright Black
--- color_10: '#E82424'     Bright Red (Command error)
--- color_11: '#98BB6C'     Bright Green (Exec)
--- color_12: '#E6C384'     Bright Yellow
--- color_13: '#7FB4CA'     Bright Blue (Folder)
--- color_14: '#938AA9'     Bright Magenta
--- color_15: '#7AA89F'    # Bright Cyan
--- color_16: '#DCD7BA'    # Bright White
---
--- background: '#1F1F28'  # Background
--- foreground: '#DCD7BA'  # Foreground (Text)
---
--- cursor: '#DCD7BA'      # Cursor
 local kanagawa = {
 	background = "#1F1F28",
 	foreground = "#DCD7BA",
@@ -171,6 +122,7 @@ table.insert(keys, { mods = "LEADER", key = "s", action = workspace_switcher.swi
 table.insert(keys, { mods = "LEADER", key = "[", action = act.SwitchWorkspaceRelative(1) })
 table.insert(keys, { mods = "LEADER", key = "]", action = act.SwitchWorkspaceRelative(-1) })
 
+-- create workspace
 table.insert(keys, {
 	mods = "LEADER",
 	key = "c",
@@ -188,6 +140,7 @@ table.insert(keys, {
 	}),
 })
 
+-- save workspace
 table.insert(keys, {
 	mods = "LEADER",
 	key = "w",
@@ -197,6 +150,7 @@ table.insert(keys, {
 	end),
 })
 
+-- delete workspace
 table.insert(keys, {
 	mods = "LEADER",
 	key = "d",
@@ -213,6 +167,7 @@ table.insert(keys, {
 	end),
 })
 
+-- resurect load
 table.insert(keys, {
 	mods = "LEADER",
 	key = "r",
@@ -254,6 +209,7 @@ wezterm.on("open-new-workspace-prompt", function(_, _)
 	workspace_create_is_active = true
 end)
 
+-- window color
 local function hash(str)
 	local h = 5381
 
@@ -263,6 +219,7 @@ local function hash(str)
 	return h
 end
 
+-- tabs
 wezterm.on("update-right-status", function(window, _)
 	local active_workspace = window:active_workspace()
 	local num = (hash(active_workspace) % #colors_tab) + 1
@@ -393,9 +350,12 @@ config.window_padding = {
 }
 
 -- font
-config.font = wezterm.font("JetBrainsMono Nerd Font Mono", { weight = "Light" })
-config.font_size = 16.0
+config.font = wezterm.font("JetBrainsMono Nerd Font Mono", { weight = 300 })
+config.font_size = 14.0
+config.line_height = 1.25
 
 config.keys = keys
+
+
 
 return config
