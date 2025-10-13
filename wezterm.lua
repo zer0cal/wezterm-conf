@@ -1,5 +1,4 @@
 local wezterm = require("wezterm")
-local sessionizer = require("sessionizer").setup
 local resurrect = wezterm.plugin.require("https://github.com/MLFlexer/resurrect.wezterm")
 local workspace_switcher = wezterm.plugin.require("https://github.com/MLFlexer/smart_workspace_switcher.wezterm")
 local config = {}
@@ -7,45 +6,48 @@ local keys = {}
 local mux = wezterm.mux
 local act = wezterm.action
 
-local kanagawa = {
-	background = "#1F1F28",
-	foreground = "#DCD7BA",
-	text = "#DCD7BA",
-	comment = "#727169",
-	terminal_white = "#C8C093",
-	terminal_black = "#090618",
-	black = "#292D3E",
-	white = "#C8C093",
-	purple = "#938AA9",
-	blue = "#7E9CD8",
-	light_blue = "#7FB4CA",
-	teal_b = "#6A9589",
-	light_teal = "#7AA89F",
-	teal_g = "#98BB6C",
-	green = "#76946A",
-	yellow = "#C0A36E",
-	light_orange = "#E6C384",
-	orange = "#E82424",
-	red = "#C34043",
-	magenta = "#957FB8",
+-- theme
+-- config.color_scheme = "Tokyo Night"
+-- config.color_scheme = "Kanagawa (Gogh)"
+config.color_scheme = "rose-pine"
+
+-- local kanagawa = {
+-- 	background = "#1F1F28",
+-- 	foreground = "#DCD7BA",
+-- 	text = "#DCD7BA",
+-- 	comment = "#727169",
+-- 	terminal_white = "#C8C093",
+-- 	terminal_black = "#090618",
+-- 	black = "#292D3E",
+-- 	white = "#C8C093",
+-- 	purple = "#938AA9",
+-- 	blue = "#7E9CD8",
+-- 	light_blue = "#7FB4CA",
+-- 	teal_b = "#6A9589",
+-- 	light_teal = "#7AA89F",
+-- 	teal_g = "#98BB6C",
+-- 	green = "#76946A",
+-- 	yellow = "#C0A36E",
+-- 	light_orange = "#E6C384",
+-- 	orange = "#E82424",
+-- 	red = "#C34043",
+-- 	magenta = "#957FB8",
+-- }
+
+local rose_pine = {
+	foreground = "#e0def4",
+	background = "#191724",
+	cursor_bg = "#e0def4",
+	cursor_border = "#e0def4",
+	cursor_fg = "#191724",
+	selection_bg = "#403d52",
+	selection_fg = "#e0def4",
+	ansi = { "#26233a","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4" },
+	brights = {"#6e6a86","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4" },
 }
 
-local setted_colors = kanagawa
-
-local colors_tab = {
-	kanagawa.purple,
-	kanagawa.blue,
-	kanagawa.light_blue,
-	kanagawa.teal_b,
-	kanagawa.light_teal,
-	kanagawa.teal_g,
-	kanagawa.green,
-	kanagawa.yellow,
-	kanagawa.light_orange,
-	kanagawa.orange,
-	kanagawa.red,
-	kanagawa.magenta,
-}
+local setted_colors = rose_pine
+local colors_tab = rose_pine.brights
 
 config.initial_cols = 110
 config.initial_rows = 30
@@ -65,25 +67,15 @@ config.leader = { mods = "ALT", key = "q", timeout_miliseconds = 2000 }
 table.insert(keys, { mods = "LEADER", key = "t", action = act.SpawnTab("CurrentPaneDomain") })
 table.insert(keys, { mods = "LEADER", key = "q", action = act.CloseCurrentPane({ confirm = true }) })
 table.insert(keys, { mods = "LEADER", key = "Q", action = act.CloseCurrentTab({ confirm = true }) })
-table.insert(keys, { mods = "LEADER", key = "1", action = act.ActivateTab(0) })
 table.insert(keys, { mods = "ALT", key = "1", action = act.ActivateTab(0) })
-table.insert(keys, { mods = "LEADER", key = "2", action = act.ActivateTab(1) })
 table.insert(keys, { mods = "ALT", key = "2", action = act.ActivateTab(1) })
-table.insert(keys, { mods = "LEADER", key = "3", action = act.ActivateTab(2) })
 table.insert(keys, { mods = "ALT", key = "3", action = act.ActivateTab(2) })
-table.insert(keys, { mods = "LEADER", key = "4", action = act.ActivateTab(3) })
 table.insert(keys, { mods = "ALT", key = "4", action = act.ActivateTab(3) })
-table.insert(keys, { mods = "LEADER", key = "5", action = act.ActivateTab(4) })
 table.insert(keys, { mods = "ALT", key = "5", action = act.ActivateTab(4) })
-table.insert(keys, { mods = "LEADER", key = "6", action = act.ActivateTab(5) })
 table.insert(keys, { mods = "ALT", key = "6", action = act.ActivateTab(5) })
-table.insert(keys, { mods = "LEADER", key = "7", action = act.ActivateTab(6) })
 table.insert(keys, { mods = "ALT", key = "7", action = act.ActivateTab(6) })
-table.insert(keys, { mods = "LEADER", key = "8", action = act.ActivateTab(7) })
 table.insert(keys, { mods = "ALT", key = "8", action = act.ActivateTab(7) })
-table.insert(keys, { mods = "LEADER", key = "9", action = act.ActivateTab(8) })
 table.insert(keys, { mods = "ALT", key = "9", action = act.ActivateTab(8) })
-table.insert(keys, { mods = "LEADER", key = "0", action = act.ActivateTab(9) })
 table.insert(keys, { mods = "ALT", key = "0", action = act.ActivateTab(9) })
 table.insert(keys, { mods = "LEADER", key = "\\", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) })
 table.insert(keys, { mods = "LEADER", key = "-", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) })
@@ -96,9 +88,6 @@ table.insert(keys, { mods = "LEADER", key = "RightArrow", action = act.AdjustPan
 table.insert(keys, { mods = "LEADER", key = "DownArrow", action = act.AdjustPaneSize({ "Down", 5 }) })
 table.insert(keys, { mods = "LEADER", key = "UpArrow", action = act.AdjustPaneSize({ "Up", 5 }) })
 
--- theme
--- config.color_scheme = "Tokyo Night"
-config.color_scheme = "Kanagawa (Gogh)"
 
 -- tab_bar
 config.enable_tab_bar = true
@@ -112,7 +101,7 @@ end)
 
 -- workspce
 workspace_switcher.zoxide_path =
-	"~/AppData/Local/Microsoft/WinGet/Packages/ajeetdsouza.zoxide_Microsoft.Winget.Source_8wekyb3d8bbwe"
+"~/AppData/Local/Microsoft/WinGet/Packages/ajeetdsouza.zoxide_Microsoft.Winget.Source_8wekyb3d8bbwe"
 local workspace_switch_is_active = false
 local workspace_create_is_active = false
 local workspace_delete_is_active = false
@@ -175,8 +164,8 @@ table.insert(keys, {
 		workspace_resurrect_is_active = true
 		resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id, _)
 			local type = string.match(id, "^([^/]+)") -- match before '/'
-			id = string.match(id, "([^/]+)$") -- match after '/'
-			id = string.match(id, "(.+)%..+$") -- remove file extention
+			id = string.match(id, "([^/]+)$")      -- match after '/'
+			id = string.match(id, "(.+)%..+$")     -- remove file extention
 			local opts = {
 				spawn_in_workspace = true,
 				relative = true,
@@ -233,20 +222,20 @@ wezterm.on("update-right-status", function(window, _)
 					fg_color = bg,
 				},
 				inactive_tab_hover = {
-					bg_color = setted_colors.black,
-					fg_color = setted_colors.comment,
+					bg_color = setted_colors.background,
+					fg_color = setted_colors.foreground,
 				},
 				inactive_tab = {
 					bg_color = setted_colors.background,
-					fg_color = setted_colors.comment,
+					fg_color = setted_colors.foreground,
 				},
 				new_tab_hover = {
-					bg_color = setted_colors.black,
-					fg_color = setted_colors.comment,
+					bg_color = setted_colors.background,
+					fg_color = setted_colors.foreground,
 				},
 				new_tab = {
 					bg_color = setted_colors.background,
-					fg_color = setted_colors.comment,
+					fg_color = setted_colors.foreground,
 				},
 			},
 		},
@@ -285,35 +274,35 @@ end)
 wezterm.on("update-right-status", function(window, _)
 	local prefix = " > "
 	local bg = setted_colors.background
-	local fg = setted_colors.comment
+	local fg = setted_colors.foreground
 
 	if window:leader_is_active() then
 		prefix = " L "
-		bg = setted_colors.blue
+		bg = setted_colors.brights[0]
 		fg = setted_colors.background
 	end
 
 	if workspace_switch_is_active then
 		prefix = " S "
-		bg = setted_colors.orange
+		bg = setted_colors.brights[1]
 		fg = setted_colors.background
 	end
 
 	if workspace_create_is_active then
 		prefix = " C "
-		bg = setted_colors.green
+		bg = setted_colors.brights[2]
 		fg = setted_colors.background
 	end
 
 	if workspace_delete_is_active then
 		prefix = " D "
-		bg = setted_colors.red
+		bg = setted_colors.brights[3]
 		fg = setted_colors.background
 	end
 
 	if workspace_resurrect_is_active then
 		prefix = " R "
-		bg = setted_colors.teal_g
+		bg = setted_colors.brights[4]
 		fg = setted_colors.background
 	end
 
@@ -334,7 +323,7 @@ config.window_frame = {
 	border_bottom_height = "0px",
 	border_top_height = "0px",
 	active_titlebar_bg = setted_colors.background,
-	inactive_titlebar_bg = setted_colors.black,
+	inactive_titlebar_bg = setted_colors.background,
 }
 
 -- config.window_background_opacity = 0.2
@@ -355,7 +344,5 @@ config.font_size = 14.0
 config.line_height = 1.25
 
 config.keys = keys
-
-
 
 return config
