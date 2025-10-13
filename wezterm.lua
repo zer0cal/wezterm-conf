@@ -42,6 +42,7 @@ local rose_pine = {
 	cursor_fg = "#191724",
 	selection_bg = "#403d52",
 	selection_fg = "#e0def4",
+	comment = "#6e6a86",
 	ansi = { "#26233a","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4" },
 	brights = {"#6e6a86","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4" },
 }
@@ -227,7 +228,7 @@ wezterm.on("update-right-status", function(window, _)
 				},
 				inactive_tab = {
 					bg_color = setted_colors.background,
-					fg_color = setted_colors.foreground,
+					fg_color = setted_colors.comment,
 				},
 				new_tab_hover = {
 					bg_color = setted_colors.background,
@@ -235,7 +236,7 @@ wezterm.on("update-right-status", function(window, _)
 				},
 				new_tab = {
 					bg_color = setted_colors.background,
-					fg_color = setted_colors.foreground,
+					fg_color = setted_colors.comment,
 				},
 			},
 		},
