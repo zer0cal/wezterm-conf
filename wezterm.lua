@@ -7,32 +7,7 @@ local mux = wezterm.mux
 local act = wezterm.action
 
 -- theme
--- config.color_scheme = "Tokyo Night"
--- config.color_scheme = "Kanagawa (Gogh)"
 config.color_scheme = "rose-pine"
-
--- local kanagawa = {
--- 	background = "#1F1F28",
--- 	foreground = "#DCD7BA",
--- 	text = "#DCD7BA",
--- 	comment = "#727169",
--- 	terminal_white = "#C8C093",
--- 	terminal_black = "#090618",
--- 	black = "#292D3E",
--- 	white = "#C8C093",
--- 	purple = "#938AA9",
--- 	blue = "#7E9CD8",
--- 	light_blue = "#7FB4CA",
--- 	teal_b = "#6A9589",
--- 	light_teal = "#7AA89F",
--- 	teal_g = "#98BB6C",
--- 	green = "#76946A",
--- 	yellow = "#C0A36E",
--- 	light_orange = "#E6C384",
--- 	orange = "#E82424",
--- 	red = "#C34043",
--- 	magenta = "#957FB8",
--- }
 
 local rose_pine = {
 	foreground = "#e0def4",
@@ -44,11 +19,12 @@ local rose_pine = {
 	selection_fg = "#e0def4",
 	comment = "#6e6a86",
 	ansi = { "#26233a","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4" },
-	brights = {"#6e6a86","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4" },
+	brights = { "#6e6a86","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4" },
+	colors = { "#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba", "#b4637a", "#ea9d34", "#d7827e", "#286983", "#56949f", "#907aa9" }
 }
 
 local setted_colors = rose_pine
-local colors_tab = rose_pine.brights
+local colors_tab = rose_pine.colors
 
 config.initial_cols = 110
 config.initial_rows = 30
