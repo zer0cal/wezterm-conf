@@ -6,6 +6,8 @@ local keys = {}
 local mux = wezterm.mux
 local act = wezterm.action
 
+local alpha = 0.1
+
 -- theme
 config.color_scheme = "rose-pine"
 
@@ -18,9 +20,22 @@ local rose_pine = {
 	selection_bg = "#403d52",
 	selection_fg = "#e0def4",
 	comment = "#6e6a86",
-	ansi = { "#26233a","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4" },
-	brights = { "#6e6a86","#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba","#e0def4" },
-	colors = { "#eb6f92","#31748f","#f6c177","#9ccfd8","#c4a7e7","#ebbcba", "#b4637a", "#ea9d34", "#d7827e", "#286983", "#56949f", "#907aa9" }
+	ansi = { "#26233a", "#eb6f92", "#31748f", "#f6c177", "#9ccfd8", "#c4a7e7", "#ebbcba", "#e0def4" },
+	brights = { "#6e6a86", "#eb6f92", "#31748f", "#f6c177", "#9ccfd8", "#c4a7e7", "#ebbcba", "#e0def4" },
+	colors = {
+		"#eb6f92",
+		"#31748f",
+		"#f6c177",
+		"#9ccfd8",
+		"#c4a7e7",
+		"#ebbcba",
+		"#b4637a",
+		"#ea9d34",
+		"#d7827e",
+		"#286983",
+		"#56949f",
+		"#907aa9",
+	},
 }
 
 local setted_colors = rose_pine
@@ -65,7 +80,6 @@ table.insert(keys, { mods = "LEADER", key = "RightArrow", action = act.AdjustPan
 table.insert(keys, { mods = "LEADER", key = "DownArrow", action = act.AdjustPaneSize({ "Down", 5 }) })
 table.insert(keys, { mods = "LEADER", key = "UpArrow", action = act.AdjustPaneSize({ "Up", 5 }) })
 
-
 -- tab_bar
 config.enable_tab_bar = true
 config.integrated_title_button_style = "Windows"
@@ -78,7 +92,7 @@ end)
 
 -- workspce
 workspace_switcher.zoxide_path =
-"~/AppData/Local/Microsoft/WinGet/Packages/ajeetdsouza.zoxide_Microsoft.Winget.Source_8wekyb3d8bbwe"
+	"~/AppData/Local/Microsoft/WinGet/Packages/ajeetdsouza.zoxide_Microsoft.Winget.Source_8wekyb3d8bbwe"
 local workspace_switch_is_active = false
 local workspace_create_is_active = false
 local workspace_delete_is_active = false
@@ -141,8 +155,8 @@ table.insert(keys, {
 		workspace_resurrect_is_active = true
 		resurrect.fuzzy_loader.fuzzy_load(win, pane, function(id, _)
 			local type = string.match(id, "^([^/]+)") -- match before '/'
-			id = string.match(id, "([^/]+)$")      -- match after '/'
-			id = string.match(id, "(.+)%..+$")     -- remove file extention
+			id = string.match(id, "([^/]+)$") -- match after '/'
+			id = string.match(id, "(.+)%..+$") -- remove file extention
 			local opts = {
 				spawn_in_workspace = true,
 				relative = true,
@@ -190,12 +204,14 @@ wezterm.on("update-right-status", function(window, _)
 	local active_workspace = window:active_workspace()
 	local num = (hash(active_workspace) % #colors_tab) + 1
 	local bg = colors_tab[num]
+	local transparent_background = "rgba(0,0,0,0)"
 	local overrides = {
 		colors = {
 			tab_bar = {
-				background = setted_colors.background,
+				-- background = setted_colors.background,
+				background = transparent_background,
 				active_tab = {
-					bg_color = setted_colors.background,
+					bg_color = transparent_background,
 					fg_color = bg,
 				},
 				inactive_tab_hover = {
@@ -203,7 +219,7 @@ wezterm.on("update-right-status", function(window, _)
 					fg_color = setted_colors.foreground,
 				},
 				inactive_tab = {
-					bg_color = setted_colors.background,
+					bg_color = transparent_background,
 					fg_color = setted_colors.comment,
 				},
 				new_tab_hover = {
@@ -211,7 +227,7 @@ wezterm.on("update-right-status", function(window, _)
 					fg_color = setted_colors.foreground,
 				},
 				new_tab = {
-					bg_color = setted_colors.background,
+					bg_color = transparent_background,
 					fg_color = setted_colors.comment,
 				},
 			},
@@ -255,37 +271,42 @@ wezterm.on("update-right-status", function(window, _)
 
 	if window:leader_is_active() then
 		prefix = " L "
-		bg = setted_colors.brights[0]
-		fg = setted_colors.background
+		-- bg = setted_colors.brights[1]
+		-- fg = setted_colors.background
+		fg = setted_colors.brights[7]
 	end
 
 	if workspace_switch_is_active then
 		prefix = " S "
-		bg = setted_colors.brights[1]
-		fg = setted_colors.background
+		-- bg = setted_colors.brights[2]
+		-- fg = setted_colors.background
+		fg = setted_colors.brights[4]
 	end
 
 	if workspace_create_is_active then
 		prefix = " C "
-		bg = setted_colors.brights[2]
-		fg = setted_colors.background
+		-- bg = setted_colors.brights[3]
+		-- fg = setted_colors.background
+		fg = setted_colors.brights[6]
 	end
 
 	if workspace_delete_is_active then
 		prefix = " D "
-		bg = setted_colors.brights[3]
-		fg = setted_colors.background
+		-- bg = setted_colors.brights[4]
+		-- fg = setted_colors.background
+		fg = setted_colors.brights[2]
 	end
 
 	if workspace_resurrect_is_active then
 		prefix = " R "
-		bg = setted_colors.brights[4]
-		fg = setted_colors.background
+		-- bg = setted_colors.brights[5]
+		-- fg = setted_colors.background
+		fg = setted_colors.brights[3]
 	end
 
 	window:set_left_status(wezterm.format({
 		{ Attribute = { Intensity = "Bold" } },
-		{ Background = { Color = bg } },
+		{ Background = { Color = "rgba(0,0,0,0)" } },
 		{ Foreground = { Color = fg } },
 		{ Text = prefix },
 	}))
@@ -300,13 +321,14 @@ config.window_frame = {
 	border_bottom_height = "0px",
 	border_top_height = "0px",
 	active_titlebar_bg = setted_colors.background,
+	-- active_titlebar_bg = "rgba(0,0,0,0)",
 	inactive_titlebar_bg = setted_colors.background,
 }
 
--- config.window_background_opacity = 0.2
--- config.win32_system_backdrop = 'Tabbed'
+config.window_background_opacity = alpha
+config.win32_system_backdrop = "Tabbed"
 
-config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
+config.window_decorations = "RESIZE"
 
 config.window_padding = {
 	left = 0,
@@ -316,9 +338,9 @@ config.window_padding = {
 }
 
 -- font
-config.font = wezterm.font("JetBrainsMono Nerd Font Mono", { weight = 300 })
-config.font_size = 14.0
-config.line_height = 1.25
+config.font = wezterm.font("JetBrainsMono Nerd Font Mono", { weight = "Light" })
+config.font_size = 15.0
+-- config.line_height = 1.25
 
 config.keys = keys
 
